@@ -1,0 +1,2 @@
+# lingua
+Dictionary trainer
