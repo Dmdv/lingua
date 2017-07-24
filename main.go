@@ -69,7 +69,7 @@ func main() {
 		log.Printf("%+v\n", update)
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-		msg.ReplyToMessageID = update.Message.MessageID
+		// msg.ReplyToMessageID = update.Message.MessageID
 
 		log.Println("Sending message")
 		bot.Send(msg)
