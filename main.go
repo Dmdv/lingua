@@ -69,6 +69,29 @@ func main() {
 		log.Printf("%+v\n", update)
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+
+
+		kbd1 := tgbotapi.NewInlineKeyboardButtonData("     Вперёд     ", "Next")
+		kbd2 := tgbotapi.NewInlineKeyboardButtonData("     Назад      ", "Back")
+
+		buttons := []tgbotapi.InlineKeyboardButton {kbd1, kbd2}
+
+		markup := tgbotapi.NewInlineKeyboardMarkup(buttons)
+
+		/*
+		str1 := "Back"
+		markup := tgbotapi.InlineKeyboardMarkup{
+			InlineKeyboard: [][]tgbotapi.InlineKeyboardButton{
+				{
+					tgbotapi.InlineKeyboardButton{Text: "Вперёд", CallbackData: &str1},
+					tgbotapi.InlineKeyboardButton{Text: "Назад", CallbackData: &str1},
+				},
+			},
+		}
+		*/
+
+
+		msg.ReplyMarkup = markup
 		// msg.ReplyToMessageID = update.Message.MessageID
 
 		log.Println("Sending message")
