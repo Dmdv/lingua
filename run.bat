@@ -1,1 +1,2 @@
-goapp serve --port=9999
+go build main.go
+main

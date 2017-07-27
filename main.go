@@ -16,6 +16,7 @@ const (
 )
 
 func main() {
+
 	bot, err := tgbotapi.NewBotAPI(Token)
 	if err != nil {
 		log.Panic(err)
@@ -68,15 +69,46 @@ func main() {
 		log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
 		log.Printf("%+v\n", update)
 
+		// Process commands
+
+		if update.Message.IsCommand(){
+
+			// format is just a word
+			log.Printf("This is command: '%s'", update.Message.Command())
+			log.Printf("Arguments: '%s'", update.Message.CommandArguments())
+
+			var text string
+
+			switch update.Message.Command() {
+			case "about":
+				text = "Карманный переводчик с поддержкой множества языков"
+			case "help":
+				text = "При помощи команд из списка выберите пару языков, " +
+					"словарь по умолчанию, количество словарных " +
+					"статей на одно сообщение"
+			case "from":
+				text = "Вы выбрали язык, с которого надо перевести"
+				// TODO: Reply buttons
+			case "to":
+				text = "Вы выбрали язык, на который надо перевести"
+				// TODO: Reply buttons
+			case "dic":
+				text = "Вы выбрали словарь по умолчанию"
+				// TODO: Reply buttons
+			case "count":
+				text = "Вы выбрали количество словарных статей на одно сообщение"
+			}
+
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
+			bot.Send(msg)
+			continue
+		}
+
+		// Process callbacks
+
+		// Reply with translation
+
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-
-
-		kbd1 := tgbotapi.NewInlineKeyboardButtonData("     Вперёд     ", "Next")
-		kbd2 := tgbotapi.NewInlineKeyboardButtonData("     Назад      ", "Back")
-
-		buttons := []tgbotapi.InlineKeyboardButton {kbd1, kbd2}
-
-		markup := tgbotapi.NewInlineKeyboardMarkup(buttons)
 
 		/*
 		str1 := "Back"
@@ -90,13 +122,26 @@ func main() {
 		}
 		*/
 
-
-		msg.ReplyMarkup = markup
+		markup := CreateInlineButtons()
 		// msg.ReplyToMessageID = update.Message.MessageID
+		msg.ReplyMarkup = markup
 
 		log.Println("Sending message")
 		bot.Send(msg)
 	}
+}
+func CreateKeyboardButtons() tgbotapi.ReplyKeyboardMarkup {
+	btn1 := tgbotapi.NewKeyboardButton("KeyboardButton1")
+	btn2 := tgbotapi.NewKeyboardButton("KeyboardButton2")
+	row := tgbotapi.NewKeyboardButtonRow(btn1, btn2)
+	return tgbotapi.NewReplyKeyboard(row)
+}
+
+func CreateInlineButtons() tgbotapi.InlineKeyboardMarkup {
+	kbd1 := tgbotapi.NewInlineKeyboardButtonData("   Назад  ", "Back")
+	kbd2 := tgbotapi.NewInlineKeyboardButtonData("   Вперёд   ", "Next")
+	markup := tgbotapi.NewInlineKeyboardRow(kbd1, kbd2)
+	return tgbotapi.NewInlineKeyboardMarkup(markup)
 }
 
 func DeleteWebHookIfSet(bot *tgbotapi.BotAPI) {
