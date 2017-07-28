@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"lingua/langs"
 )
 
 const (
@@ -78,6 +79,7 @@ func main() {
 			log.Printf("Arguments: '%s'", update.Message.CommandArguments())
 
 			var text string
+			var markup interface{}
 
 			switch update.Message.Command() {
 			case "about":
@@ -88,39 +90,30 @@ func main() {
 					"статей на одно сообщение"
 			case "from":
 				text = "Вы выбрали язык, с которого надо перевести"
-				// TODO: Reply buttons
+				markup = CreateLanguagesButtons()
 			case "to":
 				text = "Вы выбрали язык, на который надо перевести"
-				// TODO: Reply buttons
+				markup = CreateLanguagesButtons()
 			case "dic":
 				text = "Вы выбрали словарь по умолчанию"
 				// TODO: Reply buttons
 			case "count":
 				text = "Вы выбрали количество словарных статей на одно сообщение"
+			case "feedback":
+				text = "Напишите отзывы и пожелания"
 			}
 
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
+			msg.ReplyMarkup = markup
 			bot.Send(msg)
 			continue
 		}
 
-		// Process callbacks
+		// TODO: Process callbacks
 
-		// Reply with translation
+		// TODO: Reply with translation
 
 		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-
-		/*
-		str1 := "Back"
-		markup := tgbotapi.InlineKeyboardMarkup{
-			InlineKeyboard: [][]tgbotapi.InlineKeyboardButton{
-				{
-					tgbotapi.InlineKeyboardButton{Text: "Вперёд", CallbackData: &str1},
-					tgbotapi.InlineKeyboardButton{Text: "Назад", CallbackData: &str1},
-				},
-			},
-		}
-		*/
 
 		markup := CreateInlineButtons()
 		// msg.ReplyToMessageID = update.Message.MessageID
@@ -130,6 +123,27 @@ func main() {
 		bot.Send(msg)
 	}
 }
+
+func CreateLanguagesButtons() tgbotapi.ReplyKeyboardMarkup {
+
+	var keyboard [][]tgbotapi.KeyboardButton
+
+	for idx := 0; idx < len(langs.AvailableLangs); idx += 2 {
+
+		btn1 := tgbotapi.NewKeyboardButton(langs.AvailableLangs[idx])
+		btn2 := tgbotapi.NewKeyboardButton(langs.AvailableLangs[idx+1])
+
+		row := tgbotapi.NewKeyboardButtonRow(btn1, btn2)
+
+		keyboard = append(keyboard, row)
+	}
+
+	return tgbotapi.ReplyKeyboardMarkup{
+		ResizeKeyboard: true,
+		Keyboard:       keyboard,
+	}
+}
+
 func CreateKeyboardButtons() tgbotapi.ReplyKeyboardMarkup {
 	btn1 := tgbotapi.NewKeyboardButton("KeyboardButton1")
 	btn2 := tgbotapi.NewKeyboardButton("KeyboardButton2")
@@ -164,3 +178,15 @@ func DeleteWebHookIfSet(bot *tgbotapi.BotAPI) {
 		log.Printf("Failed to delete with status: %s", response.Description)
 	}
 }
+
+/*
+str1 := "Back"
+markup := tgbotapi.InlineKeyboardMarkup{
+	InlineKeyboard: [][]tgbotapi.InlineKeyboardButton{
+		{
+			tgbotapi.InlineKeyboardButton{Text: "Вперёд", CallbackData: &str1},
+			tgbotapi.InlineKeyboardButton{Text: "Назад", CallbackData: &str1},
+		},
+	},
+}
+*/
